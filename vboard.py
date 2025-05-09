@@ -51,6 +51,7 @@ class VirtualKeyboard(Gtk.Window):
         self.bg_color = "0, 0, 0"  # background color
         self.opacity="0.90"
         self.text_color="255, 255, 255" #text color
+        self.highlight_color="64, 64, 64" #highlight color when pressing down on something
         self.read_settings()
 
         self.modifiers = {
@@ -98,6 +99,7 @@ class VirtualKeyboard(Gtk.Window):
         self.row_buttons=[]
         self.color_combobox = Gtk.ComboBoxText()
         self.text_color_combobox = Gtk.ComboBoxText()
+        self.highlight_color_combobox = Gtk.ComboBoxText()
         # Set the header bar as the titlebar of the window
         self.set_titlebar(self.header)
         self.create_settings()
@@ -142,10 +144,16 @@ class VirtualKeyboard(Gtk.Window):
         self.text_color_combobox.connect("changed", self.change_text_color)
         self.text_color_combobox.set_name("combobox")
         self.header.add(self.text_color_combobox)
+        self.highlight_color_combobox.append_text("Change Highlight Color")
+        self.highlight_color_combobox.set_active(0)
+        self.highlight_color_combobox.connect("changed", self.change_highlight_color)
+        self.highlight_color_combobox.set_name("combobox")
+        self.header.add(self.highlight_color_combobox)
 
         for label, color in self.colors:
             self.color_combobox.append_text(label)
             self.text_color_combobox.append_text(label)
+            self.highlight_color_combobox.append_text(label)
 
     def on_resize(self, widget, event):
         self.width, self.height = self.get_size()  # Get the current size after resize
@@ -173,6 +181,7 @@ class VirtualKeyboard(Gtk.Window):
                 button.set_visible(not button.get_visible())
         self.color_combobox.set_visible(not self.color_combobox.get_visible())
         self.text_color_combobox.set_visible(not self.text_color_combobox.get_visible())
+        self.highlight_color_combobox.set_visible(not self.highlight_color_combobox.get_visible())
 
     def change_color (self, widget):
         label=self.color_combobox.get_active_text()
@@ -186,6 +195,13 @@ class VirtualKeyboard(Gtk.Window):
         for label_ , color_ in self.colors:
             if label_==label:
                 self.text_color = color_
+        self.apply_css()
+
+    def change_highlight_color(self, widget):
+        label = self.highlight_color_combobox.get_active_text()
+        for label_ , color_ in self.colors:
+            if label_==label:
+                self.highlight_color = color_
         self.apply_css()
 
     def change_opacity(self,widget, boolean):
@@ -251,8 +267,8 @@ class VirtualKeyboard(Gtk.Window):
         }}
 
        #grid button:hover {{
-            border: 1px solid #00CACB;
-            background-color: #00CACB;
+            border: 1px solid rgb({self.highlight_color});
+            background-color: rgb({self.highlight_color});
         }}
 
        tooltip {{
@@ -360,6 +376,7 @@ class VirtualKeyboard(Gtk.Window):
                 self.bg_color = self.config.get("DEFAULT", "bg_color")
                 self.opacity = self.config.get("DEFAULT", "opacity" )
                 self.text_color = self.config.get("DEFAULT", "text_color", fallback="255, 255, 255")
+                self.highlight_color = self.config.get("DEFAULT", "highlight_color", fallback="64, 64, 64")
                 self.width=self.config.getint("DEFAULT", "width" , fallback=0)
                 self.height=self.config.getint("DEFAULT", "height", fallback=0)
                 print(f"background: rgba: {self.bg_color}, {self.opacity}")
@@ -372,7 +389,7 @@ class VirtualKeyboard(Gtk.Window):
 
     def save_settings(self):
 
-        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "text_color": self.text_color, "width": self.width, "height": self.height}
+        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "text_color": self.text_color, "highlight_color": self.highlight_color, "width": self.width, "height": self.height}
 
         try:
             with open(self.CONFIG_FILE, "w") as configfile:
