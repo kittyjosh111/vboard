@@ -24,11 +24,10 @@ key_mapping = {uinput.KEY_ESC: "Esc", uinput.KEY_1: "1", uinput.KEY_2: "2", uinp
     uinput.KEY_F1: "F1", uinput.KEY_F2: "F2", uinput.KEY_F3: "F3", uinput.KEY_F4: "F4", uinput.KEY_F5: "F5", uinput.KEY_F6: "F6",
     uinput.KEY_F7: "F7", uinput.KEY_F8: "F8", uinput.KEY_F9: "F9", uinput.KEY_F10: "F10", uinput.KEY_F11: "F11", uinput.KEY_F12: "F12",
     uinput.KEY_SCROLLLOCK: "ScrollLock", uinput.KEY_PAUSE: "Pause", uinput.KEY_INSERT: "Insert", uinput.KEY_HOME: "Home",
-    uinput.KEY_PAGEUP: "PageUp", uinput.KEY_DELETE: "Del", uinput.KEY_END: "End", uinput.KEY_PAGEDOWN: "PageDown",
+    uinput.KEY_PAGEUP: "PgUp", uinput.KEY_DELETE: "Del", uinput.KEY_END: "End", uinput.KEY_PAGEDOWN: "PgDn",
     uinput.KEY_RIGHT: "→", uinput.KEY_LEFT: "←", uinput.KEY_DOWN: "↓", uinput.KEY_UP: "↑", uinput.KEY_NUMLOCK: "NumLock",
     uinput.KEY_RIGHTCTRL: "Ctrl_R", uinput.KEY_LEFTMETA:"Super_L", uinput.KEY_RIGHTMETA:"Super_R",
-    uinput.KEY_HOME:"Home", uinput.KEY_END:"End", uinput.KEY_PAGEUP:"PgUp", uinput.KEY_PAGEDOWN:"PgDn", uinput.KEY_DELETE:"Del", uinput.KEY_ESC:"Esc",
-    uinput.KEY_F1:"F1", uinput.KEY_F2:"F2", uinput.KEY_F3:"F3", uinput.KEY_F4:"F4", uinput.KEY_F5:"F5", uinput.KEY_F6:"F6", uinput.KEY_F7:"F7", uinput.KEY_F8:"F8", uinput.KEY_F9:"F9", uinput.KEY_F10:"F10", uinput.KEY_F11:"F11", uinput.KEY_F12:"F12"}
+    uinput.KEY_PRINT:"PrtSc"}
 
 class VirtualKeyboard(Gtk.Window):
     def __init__(self):
@@ -87,7 +86,10 @@ class VirtualKeyboard(Gtk.Window):
             ("Maroon", "128,0,0"),
             ("Indigo", "75,0,130"),
             ("Beige", "245,245,220"),
-            ("Lavender", "230,230,250")
+            ("Lavender", "230,230,250"),
+            ("SteamOS", "23,27,34"),
+            ("Valve Background", "76,88,69"),
+            ("Valve Text", "191,182,103")
 
         ]
         if (self.width!=0):
@@ -121,7 +123,7 @@ class VirtualKeyboard(Gtk.Window):
             ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"],
             ["CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter"],
             ["Shift_L", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "PgUp", "↑", "PgDn"],
-            ["Ctrl_L","Super_L", "Alt_L", "Space", "Ctrl_R", "Shift_R", "←", "↓", "→"]
+            ["Ctrl_L","Super_L", "Alt_L", "Space", "PrtSc", "Shift_R", "←", "↓", "→"]
         ]
 
         # Create each row and add it to the grid
@@ -324,7 +326,7 @@ class VirtualKeyboard(Gtk.Window):
     def update_label(self, show_symbols):
         button_positions = [(16, "` ~"), (17, "1 !"), (18, "2 @"), (19, "3 #"), (20, "4 $"), (21, "5 %"), (22, "6 ^"), (23, "7 &"), (24, "8 *"), (25, "9 ("), (26, "0 )")
         , (27, "- _"), (28, "= +"),(41,"[ {"), (42,"] }"), (43,"\\ |"), (54, "; :"), (55, "' \""), (65, ", <"), (66, ". >"), (67, "/ ?"),
-        (57, "Shift SHIFT"), (76, "Shift SHIFT")]
+        (57, "Shift *SHIFT"), (76, "Shift *SHIFT")]
 
         for pos, label in button_positions:
             label_parts = label.split()  
@@ -333,6 +335,35 @@ class VirtualKeyboard(Gtk.Window):
             else:
                 self.row_buttons[pos].set_label(label_parts[0])
 
+    def meta_update_label(self, capital):
+        button_positions = [(72, "Super *SUPER")]
+
+        for pos, label in button_positions:
+            label_parts = label.split()  
+            if capital:
+                self.row_buttons[pos].set_label(label_parts[1])
+            else:
+                self.row_buttons[pos].set_label(label_parts[0])
+
+    def alt_update_label(self, capital):
+        button_positions = [(73, "Alt *ALT")]
+
+        for pos, label in button_positions:
+            label_parts = label.split()  
+            if capital:
+                self.row_buttons[pos].set_label(label_parts[1])
+            else:
+                self.row_buttons[pos].set_label(label_parts[0])
+
+    def ctrl_update_label(self, capital):
+        button_positions = [(71, "Ctrl *CTRL")]
+
+        for pos, label in button_positions:
+            label_parts = label.split()  
+            if capital:
+                self.row_buttons[pos].set_label(label_parts[1])
+            else:
+                self.row_buttons[pos].set_label(label_parts[0])
 
     def on_button_click(self, widget, key_event):
         # If the key event is one of the modifiers, update its state and return.
@@ -345,6 +376,18 @@ class VirtualKeyboard(Gtk.Window):
                 self.update_label(True)
             else:
                 self.update_label(False)
+            if(self.modifiers[uinput.KEY_LEFTMETA]==True or self.modifiers[uinput.KEY_RIGHTMETA]==True):
+                self.meta_update_label(True)
+            else:
+                self.meta_update_label(False)
+            if(self.modifiers[uinput.KEY_LEFTALT]==True or self.modifiers[uinput.KEY_RIGHTALT]==True):
+                self.alt_update_label(True)
+            else:
+                self.alt_update_label(False)
+            if(self.modifiers[uinput.KEY_LEFTCTRL]==True or self.modifiers[uinput.KEY_RIGHTCTRL]==True):
+                self.ctrl_update_label(True)
+            else:
+                self.ctrl_update_label(False)
             return
         # For a normal key, press any active modifiers.
         for mod_key, active in self.modifiers.items():
@@ -361,6 +404,9 @@ class VirtualKeyboard(Gtk.Window):
             if active:
                 self.device.emit(mod_key, 0)
                 self.modifiers[mod_key] = False
+                self.meta_update_label(False)
+                self.alt_update_label(False)
+                self.ctrl_update_label(False)
 
 
     def read_settings(self):
