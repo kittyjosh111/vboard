@@ -244,6 +244,7 @@ class VirtualKeyboard(Gtk.Window):
 
        #grid button:hover {{
             border: 1px solid #00CACB;
+            color:"#00CACB";
         }}
 
        tooltip {{
