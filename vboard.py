@@ -26,7 +26,8 @@ key_mapping = {uinput.KEY_ESC: "Esc", uinput.KEY_1: "1", uinput.KEY_2: "2", uinp
     uinput.KEY_SCROLLLOCK: "ScrollLock", uinput.KEY_PAUSE: "Pause", uinput.KEY_INSERT: "Insert", uinput.KEY_HOME: "Home",
     uinput.KEY_PAGEUP: "PageUp", uinput.KEY_DELETE: "Delete", uinput.KEY_END: "End", uinput.KEY_PAGEDOWN: "PageDown",
     uinput.KEY_RIGHT: "→", uinput.KEY_LEFT: "←", uinput.KEY_DOWN: "↓", uinput.KEY_UP: "↑", uinput.KEY_NUMLOCK: "NumLock",
-    uinput.KEY_RIGHTCTRL: "Ctrl_R", uinput.KEY_LEFTMETA:"Super_L", uinput.KEY_RIGHTMETA:"Super_R"}
+    uinput.KEY_RIGHTCTRL: "Ctrl_R", uinput.KEY_LEFTMETA:"Super_L", uinput.KEY_RIGHTMETA:"Super_R",
+    uinput.KEY_HOME:"Home", uinput.KEY_END:"End", uinput.KEY_PAGEUP:"PgUp", uinput.KEY_PAGEDOWN:"PgDn"}
 
 class VirtualKeyboard(Gtk.Window):
     def __init__(self):
@@ -114,8 +115,8 @@ class VirtualKeyboard(Gtk.Window):
             ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace" ],
             ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"],
             ["CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter"],
-            ["Shift_L", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift_R", "↑"],
-            ["Ctrl_L","Super_L", "Alt_L", "Space", "Alt_R", "Super_R", "Ctrl_R", "←", "→", "↓"]
+            ["Shift_L", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "PgUp", "↑", "PgDn"],
+            ["Ctrl_L","Super_L", "Alt_L", "Space", "Home", "End", "Shift_R", "←", "↓", "→"]
         ]
 
         # Create each row and add it to the grid
@@ -279,7 +280,7 @@ class VirtualKeyboard(Gtk.Window):
                 self.row_buttons.append(button)
                 if key_label == "Space": width=12
                 elif key_label == "CapsLock": width=3
-                elif key_label == "Shift_R" : width=4
+                #elif key_label == "Shift_R" : width=4
                 elif key_label == "Shift_L" : width=4
                 elif key_label == "Backspace": width=5
                 elif key_label == "`": width=1
@@ -292,7 +293,8 @@ class VirtualKeyboard(Gtk.Window):
 
     def update_label(self, show_symbols):
         button_positions = [(0, "` ~"), (1, "1 !"), (2, "2 @"), (3, "3 #"), (4, "4 $"), (5, "5 %"), (6, "6 ^"), (7, "7 &"), (8, "8 *"), (9, "9 ("), (10, "0 )")
-        , (11, "- _"), (12, "= +"),(25,"[ {"), (26,"] }"), (27,"\\ |"), (38, "; :"), (39, "' \""), (49, ", <"), (50, ". >"), (51, "/ ?")]
+        , (11, "- _"), (12, "= +"),(25,"[ {"), (26,"] }"), (27,"\\ |"), (38, "; :"), (39, "' \""), (49, ", <"), (50, ". >"), (51, "/ ?"),
+        (41, "Shift SHIFT"), (61, "Shift SHIFT")]
 
         for pos, label in button_positions:
             label_parts = label.split()  
