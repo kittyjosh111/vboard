@@ -24,10 +24,11 @@ key_mapping = {uinput.KEY_ESC: "Esc", uinput.KEY_1: "1", uinput.KEY_2: "2", uinp
     uinput.KEY_F1: "F1", uinput.KEY_F2: "F2", uinput.KEY_F3: "F3", uinput.KEY_F4: "F4", uinput.KEY_F5: "F5", uinput.KEY_F6: "F6",
     uinput.KEY_F7: "F7", uinput.KEY_F8: "F8", uinput.KEY_F9: "F9", uinput.KEY_F10: "F10", uinput.KEY_F11: "F11", uinput.KEY_F12: "F12",
     uinput.KEY_SCROLLLOCK: "ScrollLock", uinput.KEY_PAUSE: "Pause", uinput.KEY_INSERT: "Insert", uinput.KEY_HOME: "Home",
-    uinput.KEY_PAGEUP: "PageUp", uinput.KEY_DELETE: "Delete", uinput.KEY_END: "End", uinput.KEY_PAGEDOWN: "PageDown",
+    uinput.KEY_PAGEUP: "PageUp", uinput.KEY_DELETE: "Del", uinput.KEY_END: "End", uinput.KEY_PAGEDOWN: "PageDown",
     uinput.KEY_RIGHT: "→", uinput.KEY_LEFT: "←", uinput.KEY_DOWN: "↓", uinput.KEY_UP: "↑", uinput.KEY_NUMLOCK: "NumLock",
     uinput.KEY_RIGHTCTRL: "Ctrl_R", uinput.KEY_LEFTMETA:"Super_L", uinput.KEY_RIGHTMETA:"Super_R",
-    uinput.KEY_HOME:"Home", uinput.KEY_END:"End", uinput.KEY_PAGEUP:"PgUp", uinput.KEY_PAGEDOWN:"PgDn"}
+    uinput.KEY_HOME:"Home", uinput.KEY_END:"End", uinput.KEY_PAGEUP:"PgUp", uinput.KEY_PAGEDOWN:"PgDn", uinput.KEY_DELETE:"Del", uinput.KEY_ESC:"Esc",
+    uinput.KEY_F1:"F1", uinput.KEY_F2:"F2", uinput.KEY_F3:"F3", uinput.KEY_F4:"F4", uinput.KEY_F5:"F5", uinput.KEY_F6:"F6", uinput.KEY_F7:"F7", uinput.KEY_F8:"F8", uinput.KEY_F9:"F9", uinput.KEY_F10:"F10", uinput.KEY_F11:"F11", uinput.KEY_F12:"F12"}
 
 class VirtualKeyboard(Gtk.Window):
     def __init__(self):
@@ -112,11 +113,12 @@ class VirtualKeyboard(Gtk.Window):
 
         # Define rows for keys
         rows = [
+            ["Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Home", "End", "Del" ],
             ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace" ],
             ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"],
             ["CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "Enter"],
             ["Shift_L", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "PgUp", "↑", "PgDn"],
-            ["Ctrl_L","Super_L", "Alt_L", "Space", "Home", "End", "Shift_R", "←", "↓", "→"]
+            ["Ctrl_L","Super_L", "Alt_L", "Space", "Ctrl_R", "Shift_R", "←", "↓", "→"]
         ]
 
         # Create each row and add it to the grid
@@ -280,21 +282,23 @@ class VirtualKeyboard(Gtk.Window):
                 self.row_buttons.append(button)
                 if key_label == "Space": width=12
                 elif key_label == "CapsLock": width=3
-                #elif key_label == "Shift_R" : width=4
+                elif key_label == "Shift_R" : width=4
                 elif key_label == "Shift_L" : width=4
                 elif key_label == "Backspace": width=5
                 elif key_label == "`": width=1
                 elif key_label == "\\" : width=4
                 elif key_label == "Enter": width=5
+                elif key_label == "Del": width=1
+                elif key_label == "Esc": width=1
                 else: width=2
 
                 grid.attach(button, col, row_index, width, 1)
                 col += width  # Skip 4 columns for the space button
 
     def update_label(self, show_symbols):
-        button_positions = [(0, "` ~"), (1, "1 !"), (2, "2 @"), (3, "3 #"), (4, "4 $"), (5, "5 %"), (6, "6 ^"), (7, "7 &"), (8, "8 *"), (9, "9 ("), (10, "0 )")
-        , (11, "- _"), (12, "= +"),(25,"[ {"), (26,"] }"), (27,"\\ |"), (38, "; :"), (39, "' \""), (49, ", <"), (50, ". >"), (51, "/ ?"),
-        (41, "Shift SHIFT"), (61, "Shift SHIFT")]
+        button_positions = [(16, "` ~"), (17, "1 !"), (18, "2 @"), (19, "3 #"), (20, "4 $"), (21, "5 %"), (22, "6 ^"), (23, "7 &"), (24, "8 *"), (25, "9 ("), (26, "0 )")
+        , (27, "- _"), (28, "= +"),(41,"[ {"), (42,"] }"), (43,"\\ |"), (54, "; :"), (55, "' \""), (65, ", <"), (66, ". >"), (67, "/ ?"),
+        (57, "Shift SHIFT"), (76, "Shift SHIFT")]
 
         for pos, label in button_positions:
             label_parts = label.split()  
