@@ -51,6 +51,7 @@ class VirtualKeyboard(Gtk.Window):
         #using windows osk colors as default
         self.bg_color = "51, 51, 51"  # background color
         self.opacity="0.90"
+        self.bt_color = "51, 51, 51"  # button color
         self.text_color="201, 201, 201" #text color
         self.highlight_color="1, 116, 215" #highlight color when pressing down on something
         self.border_color="26, 26, 26" #highlight color when pressing down on something
@@ -112,6 +113,7 @@ class VirtualKeyboard(Gtk.Window):
         self.text_color_combobox = Gtk.ComboBoxText()
         self.highlight_color_combobox = Gtk.ComboBoxText()
         self.border_color_combobox = Gtk.ComboBoxText()
+        self.bt_color_combobox = Gtk.ComboBoxText()
         # Set the header bar as the titlebar of the window
         self.set_titlebar(self.header)
         self.create_settings()
@@ -152,6 +154,11 @@ class VirtualKeyboard(Gtk.Window):
         self.color_combobox.connect("changed", self.change_color)
         self.color_combobox.set_name("combobox")
         self.header.add(self.color_combobox)
+        self.bt_color_combobox.append_text("Change Button Color")
+        self.bt_color_combobox.set_active(0)
+        self.bt_color_combobox.connect("changed", self.bt_change_color)
+        self.bt_color_combobox.set_name("combobox")
+        self.header.add(self.bt_color_combobox)
         self.text_color_combobox.append_text("Change Text Color")
         self.text_color_combobox.set_active(0)
         self.text_color_combobox.connect("changed", self.change_text_color)
@@ -180,6 +187,7 @@ class VirtualKeyboard(Gtk.Window):
         for label, color in self.colors:
             self.color_combobox.append_text(label)
             self.text_color_combobox.append_text(label)
+            self.bt_color_combobox.append_text(label)
             self.highlight_color_combobox.append_text(label)
             self.border_color_combobox.append_text(label)
 
@@ -216,9 +224,17 @@ class VirtualKeyboard(Gtk.Window):
             if button.get_label()!="☰":
                 button.set_visible(not button.get_visible())
         self.color_combobox.set_visible(not self.color_combobox.get_visible())
+        self.bt_color_combobox.set_visible(not self.bt_color_combobox.get_visible())
         self.text_color_combobox.set_visible(not self.text_color_combobox.get_visible())
         self.highlight_color_combobox.set_visible(not self.highlight_color_combobox.get_visible())
         self.border_color_combobox.set_visible(not self.border_color_combobox.get_visible())
+
+    def bt_change_color (self, widget):
+        label=self.bt_color_combobox.get_active_text()
+        for label_ , color_ in self.colors:
+            if label_==label:
+                self.bt_color = color_
+        self.apply_css()
 
     def change_color (self, widget):
         label=self.color_combobox.get_active_text()
@@ -318,12 +334,12 @@ class VirtualKeyboard(Gtk.Window):
         #grid button {{
                     border: {self.border_width}px solid rgba({self.border_color}, {self.opacity}) ;
                     background-image: none;
-                    border-radius: 0px;
+                    border-radius: {self.border_radius}px;
 
                 }}
 
         button {{
-            background-color: transparent;
+            background-color: rgba({self.bt_color}, {self.opacity});
             color:rgb({self.text_color});
 
         }}
@@ -331,6 +347,7 @@ class VirtualKeyboard(Gtk.Window):
        #grid button:hover {{
             border: {self.border_width}px solid rgba({self.border_color}, {self.opacity});
             background-color: rgb({self.highlight_color});
+            border-radius: {self.border_radius}px;
         }}
 
        tooltip {{
@@ -503,6 +520,7 @@ class VirtualKeyboard(Gtk.Window):
                 self.config.read(self.CONFIG_FILE)
                 self.bg_color = self.config.get("DEFAULT", "bg_color")
                 self.opacity = self.config.get("DEFAULT", "opacity" )
+                self.bt_color = self.config.get("DEFAULT", "bt_color")
                 self.text_color = self.config.get("DEFAULT", "text_color", fallback="201, 201, 201")
                 self.highlight_color = self.config.get("DEFAULT", "highlight_color", fallback="1, 116, 215")
                 self.border_color = self.config.get("DEFAULT", "border_color", fallback="26, 26, 26")
@@ -520,7 +538,7 @@ class VirtualKeyboard(Gtk.Window):
 
     def save_settings(self):
 
-        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "border_radius": self.border_radius, "width": self.width, "height": self.height}
+        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "bt_color": self.bt_color, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "border_radius": self.border_radius, "width": self.width, "height": self.height}
 
         try:
             with open(self.CONFIG_FILE, "w") as configfile:
