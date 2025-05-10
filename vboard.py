@@ -71,6 +71,18 @@ class VirtualKeyboard(Gtk.Window):
             uinput.KEY_RIGHTMETA: False
         }
         self.colors = [
+            ("SteamOS Button", "13,21,29"),
+            ("SteamOS Text", "252,252,252"),
+            ("SteamOS Highlight", "1,1,0"),
+            ("SteamOS Border + BG", "31,38,46"),
+            ("Windows 10 Button", "51,51,51"),
+            ("Windows 10 Text", "201,201,201"),
+            ("Windows 10 Highlight", "1,116,215"),
+            ("Windows 10 Border + BG", "26,26,26"),
+            ("GBoard Button", "255,254,254"),
+            ("GBoard Text", "17,17,17"),
+            ("GBoard Highlight", "27, 114, 231"),
+            ("GBoard Border + BG", "232, 236, 239"),
             ("Black", "0,0,0"),
             ("Red", "255,0,0"),
             ("Pink", "255,105,183"),
@@ -93,18 +105,7 @@ class VirtualKeyboard(Gtk.Window):
             ("Maroon", "128,0,0"),
             ("Indigo", "75,0,130"),
             ("Beige", "245,245,220"),
-            ("Lavender", "230,230,250"),
-            ("SteamOS", "23,27,34"),
-            ("Valve Background", "76,88,69"),
-            ("Valve Text", "191,182,103"),
-            ("Windows 10 Button", "51,51,51"),
-            ("Windows 10 Text", "201,201,201"),
-            ("Windows 10 Highlight", "1,116,215"),
-            ("Windows 10 Border + BG", "26,26,26"),
-            ("GBoard Button", "255,254,254"),
-            ("GBoard Text", "17,17,17"),
-            ("GBoard Highlight", "27, 114, 231"),
-            ("GBoard Border + BG", "232, 236, 239")
+            ("Lavender", "230,230,250")
 
         ]
         if (self.width!=0):
