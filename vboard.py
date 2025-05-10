@@ -371,8 +371,8 @@ class VirtualKeyboard(Gtk.Window):
         }}
 
        #grid button:hover {{
-            border: {self.border_width}px solid rgba({self.highlight_color}, {self.opacity});
-            background-color: rgb({self.highlight_color});
+            border: {self.border_width}px solid rgba({self.border_color}, {self.opacity});
+            background-color: rgba({self.highlight_color}, {self.opacity});
             border-radius: {self.border_radius}px;
         }}
 
