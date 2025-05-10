@@ -49,14 +49,15 @@ class VirtualKeyboard(Gtk.Window):
         self.config = configparser.ConfigParser()
 
         #using windows osk colors as default
-        self.bg_color = "51, 51, 51"  # background color
-        self.opacity="0.90"
+        self.bg_color = "26, 26, 26"  # background color
+        self.opacity="1.0"
         self.bt_color = "51, 51, 51"  # button color
         self.text_color="201, 201, 201" #text color
         self.highlight_color="1, 116, 215" #highlight color when pressing down on something
-        self.border_color="26, 26, 26" #highlight color when pressing down on something
-        self.border_width="1.0"
+        self.border_color="26, 26, 26" #border of the button
+        self.border_width="2.0"
         self.border_radius="0.0"
+        self.padding_padding="5.0"
         self.read_settings()
 
         self.modifiers = {
@@ -96,10 +97,10 @@ class VirtualKeyboard(Gtk.Window):
             ("SteamOS", "23,27,34"),
             ("Valve Background", "76,88,69"),
             ("Valve Text", "191,182,103"),
-            ("Windows 10 Background", "51,51,51"),
+            ("Windows 10 Button", "51,51,51"),
             ("Windows 10 Text", "201,201,201"),
             ("Windows 10 Highlight", "1,116,215"),
-            ("Windows 10 Border", "26,26,26")
+            ("Windows 10 Border + BG", "26,26,26")
 
         ]
         if (self.width!=0):
@@ -121,8 +122,11 @@ class VirtualKeyboard(Gtk.Window):
         grid = Gtk.Grid()  # Use Grid for layout
         grid.set_row_homogeneous(True)  # Allow rows to resize based on content
         grid.set_column_homogeneous(True)  # Columns are homogeneous
-        grid.set_margin_start(3)
-        grid.set_margin_end(3)
+        grid.set_margin_start(float(self.padding_padding))
+        grid.set_margin_end(float(self.padding_padding))
+        grid.set_margin_bottom(float(self.padding_padding))
+        grid.set_row_spacing(float(self.padding_padding))
+        grid.set_column_spacing(float(self.padding_padding))
         grid.set_name("grid")
         self.add(grid)
         self.apply_css()
@@ -182,6 +186,10 @@ class VirtualKeyboard(Gtk.Window):
         self.create_button("Border Radius:")
         self.create_button( f"{self.border_radius}")
         self.create_button("-", self.change_border_radius, False,2)
+        self.create_button("+", self.change_padding_padding,True,2)
+        self.create_button("Padding:")
+        self.create_button( f"{self.padding_padding}")
+        self.create_button("-", self.change_padding_padding, False,2)
         
 
         for label, color in self.colors:
@@ -215,6 +223,10 @@ class VirtualKeyboard(Gtk.Window):
         if label_==self.border_radius:
             self.border_radius_btn=button
             self.border_radius_btn.set_tooltip_text("border radius")
+
+        if label_==self.padding_padding:
+            self.padding_padding_btn=button
+            self.padding_padding_btn.set_tooltip_text("keyboard padding")
 
         self.header.add(button)
         self.buttons.append(button)
@@ -288,6 +300,14 @@ class VirtualKeyboard(Gtk.Window):
         self.border_radius_btn.set_label(f"{self.border_radius}")
         self.apply_css()
 
+    def change_padding_padding(self,widget, boolean):
+        if (boolean):
+            self.padding_padding = str(round(min(999, float(self.padding_padding) + 0.5),2))
+        else:
+            self.padding_padding = str(round(max(0, float(self.padding_padding) - 0.5),2))
+        self.padding_padding_btn.set_label(f"{self.padding_padding}")
+        self.apply_css()
+
     def apply_css (self):
         provider = Gtk.CssProvider()
 
@@ -301,8 +321,10 @@ class VirtualKeyboard(Gtk.Window):
 
         headerbar button{{
             min-width: 40px;
+            min-height: 40px;
             padding: 0px;
             border: 0px;
+            border-radius: {self.border_radius}px;
             
 
 
@@ -518,14 +540,15 @@ class VirtualKeyboard(Gtk.Window):
         try:
             if os.path.exists(self.CONFIG_FILE):
                 self.config.read(self.CONFIG_FILE)
-                self.bg_color = self.config.get("DEFAULT", "bg_color")
-                self.opacity = self.config.get("DEFAULT", "opacity" )
-                self.bt_color = self.config.get("DEFAULT", "bt_color")
+                self.bg_color = self.config.get("DEFAULT", "bg_color", fallback="26,26,26")
+                self.opacity = self.config.get("DEFAULT", "opacity", fallback="1.0" )
+                self.bt_color = self.config.get("DEFAULT", "bt_color", fallback="51, 51, 51")
                 self.text_color = self.config.get("DEFAULT", "text_color", fallback="201, 201, 201")
                 self.highlight_color = self.config.get("DEFAULT", "highlight_color", fallback="1, 116, 215")
                 self.border_color = self.config.get("DEFAULT", "border_color", fallback="26, 26, 26")
-                self.border_width = self.config.get("DEFAULT", "border_width", fallback="1.0")
+                self.border_width = self.config.get("DEFAULT", "border_width", fallback="2.0")
                 self.border_radius = self.config.get("DEFAULT", "border_radius", fallback="0.0")
+                self.padding_padding = self.config.get("DEFAULT", "padding_padding", fallback="5.0")
                 self.width=self.config.getint("DEFAULT", "width" , fallback=0)
                 self.height=self.config.getint("DEFAULT", "height", fallback=0)
                 print(f"background: rgba: {self.bg_color}, {self.opacity}")
@@ -538,7 +561,7 @@ class VirtualKeyboard(Gtk.Window):
 
     def save_settings(self):
 
-        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "bt_color": self.bt_color, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "border_radius": self.border_radius, "width": self.width, "height": self.height}
+        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "bt_color": self.bt_color, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "border_radius": self.border_radius, "padding_padding": self.padding_padding, "width": self.width, "height": self.height}
 
         try:
             with open(self.CONFIG_FILE, "w") as configfile:
