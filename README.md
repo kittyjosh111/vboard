@@ -1,8 +1,13 @@
 # vboard
 *A virtual keyboard for Linux with Wayland support and extensive customization options.*
 
+**This is a fork containing the layout I find most practical for my personal use. It has additional tweaks that allow for more precise control of theming (such as button color, width, and radius), as well as other tweaks that enhance vboard to my preferences.**
 
-<img src="https://github.com/user-attachments/assets/66e9a879-c677-429f-bd11-503d10e63c2b" width="400">
+**Just like the original project, you can change the layout by manually editing the python file. Find the list called rows, and edit the layout in there.**
+
+![Screenshot](/screenshot/image.png?raw=true "Screenshot")
+
+*vboard using the Gboard colors (left) and Win10 colors (right)*
 
 ## Overview
 vboard is a lightweight, customizable virtual keyboard designed for Linux systems with Wayland support. It provides an on-screen keyboard solution that's especially useful for:
