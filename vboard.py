@@ -54,7 +54,8 @@ class VirtualKeyboard(Gtk.Window):
         self.text_color="201, 201, 201" #text color
         self.highlight_color="1, 116, 215" #highlight color when pressing down on something
         self.border_color="26, 26, 26" #highlight color when pressing down on something
-        self.border_width="1"
+        self.border_width="1.0"
+        self.border_radius="0.0"
         self.read_settings()
 
         self.modifiers = {
@@ -170,6 +171,10 @@ class VirtualKeyboard(Gtk.Window):
         self.create_button("Border Width:")
         self.create_button( f"{self.border_width}")
         self.create_button("-", self.change_border_width, False,2)
+        self.create_button("+", self.change_border_radius,True,2)
+        self.create_button("Border Radius:")
+        self.create_button( f"{self.border_radius}")
+        self.create_button("-", self.change_border_radius, False,2)
         
 
         for label, color in self.colors:
@@ -197,7 +202,11 @@ class VirtualKeyboard(Gtk.Window):
 
         if label_==self.border_width:
             self.border_width_btn=button
-            self.border_width_btn.set_tooltip_text("Border Width")
+            self.border_width_btn.set_tooltip_text("border width")
+
+        if label_==self.border_radius:
+            self.border_radius_btn=button
+            self.border_radius_btn.set_tooltip_text("border radius")
 
         self.header.add(button)
         self.buttons.append(button)
@@ -255,6 +264,14 @@ class VirtualKeyboard(Gtk.Window):
         self.border_width_btn.set_label(f"{self.border_width}")
         self.apply_css()
 
+    def change_border_radius(self,widget, boolean):
+        if (boolean):
+            self.border_radius = str(round(min(999, float(self.border_radius) + 0.5),2))
+        else:
+            self.border_radius = str(round(max(0, float(self.border_radius) - 0.5),2))
+        self.border_radius_btn.set_label(f"{self.border_radius}")
+        self.apply_css()
+
     def apply_css (self):
         provider = Gtk.CssProvider()
 
@@ -301,6 +318,7 @@ class VirtualKeyboard(Gtk.Window):
         #grid button {{
                     border: {self.border_width}px solid rgba({self.border_color}, {self.opacity}) ;
                     background-image: none;
+                    border-radius: 0px;
 
                 }}
 
@@ -489,6 +507,7 @@ class VirtualKeyboard(Gtk.Window):
                 self.highlight_color = self.config.get("DEFAULT", "highlight_color", fallback="1, 116, 215")
                 self.border_color = self.config.get("DEFAULT", "border_color", fallback="26, 26, 26")
                 self.border_width = self.config.get("DEFAULT", "border_width", fallback="1.0")
+                self.border_radius = self.config.get("DEFAULT", "border_radius", fallback="0.0")
                 self.width=self.config.getint("DEFAULT", "width" , fallback=0)
                 self.height=self.config.getint("DEFAULT", "height", fallback=0)
                 print(f"background: rgba: {self.bg_color}, {self.opacity}")
@@ -501,7 +520,7 @@ class VirtualKeyboard(Gtk.Window):
 
     def save_settings(self):
 
-        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "width": self.width, "height": self.height}
+        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "border_radius": self.border_radius, "width": self.width, "height": self.height}
 
         try:
             with open(self.CONFIG_FILE, "w") as configfile:
