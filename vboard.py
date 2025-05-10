@@ -100,7 +100,11 @@ class VirtualKeyboard(Gtk.Window):
             ("Windows 10 Button", "51,51,51"),
             ("Windows 10 Text", "201,201,201"),
             ("Windows 10 Highlight", "1,116,215"),
-            ("Windows 10 Border + BG", "26,26,26")
+            ("Windows 10 Border + BG", "26,26,26"),
+            ("GBoard Button", "255,254,254"),
+            ("GBoard Text", "17,17,17"),
+            ("GBoard Highlight", "27, 114, 231"),
+            ("GBoard Border + BG", "232, 236, 239")
 
         ]
         if (self.width!=0):
