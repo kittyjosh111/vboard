@@ -3,6 +3,7 @@ import uinput
 import time
 import os
 import configparser
+import subprocess
 
 os.environ['GDK_BACKEND'] = 'x11'
 
@@ -365,8 +366,28 @@ class VirtualKeyboard(Gtk.Window):
             else:
                 self.row_buttons[pos].set_label(label_parts[0])
 
+    def get_caps(self):
+      try:
+        output = subprocess.check_output(["xset", "q"], universal_newlines=True)
+        for line in output.splitlines():
+          if "Caps Lock:" in line:
+            return "on" in line  # Returns True if "on", False if "off"
+      except subprocess.CalledProcessError:
+        return False
+
+    def capslock_update_label(self):
+        button_positions = [(44, "CapsLock *CAPSLOCK")]
+
+        for pos, label in button_positions:
+            label_parts = label.split()  
+            if self.get_caps():
+                self.row_buttons[pos].set_label(label_parts[1])
+            else:
+                self.row_buttons[pos].set_label(label_parts[0])
+
     def on_button_click(self, widget, key_event):
         # If the key event is one of the modifiers, update its state and return.
+        print(f"[DEBUG]: {key_event}")
         if key_event in self.modifiers:
             self.modifiers[key_event] = not self.modifiers[key_event]
             if(self.modifiers[uinput.KEY_LEFTSHIFT]==True and self.modifiers[uinput.KEY_RIGHTSHIFT]==True):
@@ -407,6 +428,8 @@ class VirtualKeyboard(Gtk.Window):
                 self.meta_update_label(False)
                 self.alt_update_label(False)
                 self.ctrl_update_label(False)
+        #if key_event == uinput.KEY_CAPSLOCK:
+        self.capslock_update_label() #and check our caps lock symbol
 
 
     def read_settings(self):
