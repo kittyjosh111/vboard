@@ -49,6 +49,7 @@ class VirtualKeyboard(Gtk.Window):
         #using windows osk colors as default
         self.bg_color = "26, 26, 26"  # background color
         self.opacity="1.0"
+        self.font_size="22.0"
         self.bt_color = "51, 51, 51"  # button color
         self.text_color="201, 201, 201" #text color
         self.highlight_color="1, 116, 215" #highlight color when pressing down on something
@@ -155,27 +156,31 @@ class VirtualKeyboard(Gtk.Window):
         self.create_button("Opacity:")
         self.create_button( f"{self.opacity}")
         self.create_button("-", self.change_opacity, False,2)
-        self.color_combobox.append_text("Change Background")
+        self.create_button("+", self.change_font,True,2)
+        self.create_button("Font:")
+        self.create_button( f"{self.font_size}")
+        self.create_button("-", self.change_font, False,2)
+        self.color_combobox.append_text("BG Color")
         self.color_combobox.set_active(0)
         self.color_combobox.connect("changed", self.change_color)
         self.color_combobox.set_name("combobox")
         self.header.add(self.color_combobox)
-        self.bt_color_combobox.append_text("Change Button Color")
+        self.bt_color_combobox.append_text("Bt Color")
         self.bt_color_combobox.set_active(0)
         self.bt_color_combobox.connect("changed", self.bt_change_color)
         self.bt_color_combobox.set_name("combobox")
         self.header.add(self.bt_color_combobox)
-        self.text_color_combobox.append_text("Change Text Color")
+        self.text_color_combobox.append_text("Text Color")
         self.text_color_combobox.set_active(0)
         self.text_color_combobox.connect("changed", self.change_text_color)
         self.text_color_combobox.set_name("combobox")
         self.header.add(self.text_color_combobox)
-        self.highlight_color_combobox.append_text("Change Highlight Color")
+        self.highlight_color_combobox.append_text("Highlight Color")
         self.highlight_color_combobox.set_active(0)
         self.highlight_color_combobox.connect("changed", self.change_highlight_color)
         self.highlight_color_combobox.set_name("combobox")
         self.header.add(self.highlight_color_combobox)
-        self.border_color_combobox.append_text("Change Border Color")
+        self.border_color_combobox.append_text("Border Color")
         self.border_color_combobox.set_active(0)
         self.border_color_combobox.connect("changed", self.change_border_color)
         self.border_color_combobox.set_name("combobox")
@@ -214,6 +219,10 @@ class VirtualKeyboard(Gtk.Window):
         if label_==self.opacity:
             self.opacity_btn=button
             self.opacity_btn.set_tooltip_text("opacity")
+
+        if label_==self.font_size:
+            self.font_size_btn=button
+            self.font_size_btn.set_tooltip_text("font size")
 
         if label_==self.border_width:
             self.border_width_btn=button
@@ -283,6 +292,14 @@ class VirtualKeyboard(Gtk.Window):
         self.opacity_btn.set_label(f"{self.opacity}")
         self.apply_css()
 
+    def change_font(self,widget, boolean):
+        if (boolean):
+            self.font_size = str(round(min(999, float(self.font_size) + 0.5),2))
+        else:
+            self.font_size = str(round(max(1.0, float(self.font_size) - 0.5),2))
+        self.font_size_btn.set_label(f"{self.font_size}")
+        self.apply_css()
+
     def change_border_width(self,widget, boolean):
         if (boolean):
             self.border_width = str(round(min(999, float(self.border_width) + 0.5),2))
@@ -326,6 +343,8 @@ class VirtualKeyboard(Gtk.Window):
 
         headerbar button label{{
             color: rgb({self.text_color});
+            font-size: 10px;
+            padding: 5px;
         }}
 
         #headbar-button, #combobox button.combo {{
@@ -338,6 +357,7 @@ class VirtualKeyboard(Gtk.Window):
 
         #grid button label{{
             color: rgb({self.text_color});
+            font-size: {self.font_size}px;
         }}
 
         #grid button {{
@@ -364,6 +384,7 @@ class VirtualKeyboard(Gtk.Window):
 
        #combobox button.combo  {{
             color: rgb({self.text_color});
+            font-size: 10px;
             padding: 5px;
         }}
         """
@@ -580,6 +601,7 @@ class VirtualKeyboard(Gtk.Window):
                 self.config.read(self.CONFIG_FILE)
                 self.bg_color = self.config.get("DEFAULT", "bg_color", fallback="26,26,26")
                 self.opacity = self.config.get("DEFAULT", "opacity", fallback="1.0" )
+                self.font_size = self.config.get("DEFAULT", "font_size", fallback="22.0" )
                 self.bt_color = self.config.get("DEFAULT", "bt_color", fallback="51, 51, 51")
                 self.text_color = self.config.get("DEFAULT", "text_color", fallback="201, 201, 201")
                 self.highlight_color = self.config.get("DEFAULT", "highlight_color", fallback="1, 116, 215")
@@ -596,7 +618,7 @@ class VirtualKeyboard(Gtk.Window):
             print(f"Warning: Could not read config file ({e}). Using default values.")
 
     def save_settings(self):
-        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "bt_color": self.bt_color, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "border_radius": self.border_radius, "padding_padding": self.padding_padding, "width": self.width, "height": self.height}
+        self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "font_size": self.font_size, "bt_color": self.bt_color, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "border_radius": self.border_radius, "padding_padding": self.padding_padding, "width": self.width, "height": self.height}
         try:
             with open(self.CONFIG_FILE, "w") as configfile:
                 self.config.write(configfile)
