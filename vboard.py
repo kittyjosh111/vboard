@@ -1,6 +1,5 @@
 import gi
 import uinput
-import time
 import os
 import configparser
 import subprocess
@@ -10,7 +9,6 @@ os.environ['GDK_BACKEND'] = 'x11'
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
-
 
 key_mapping = {uinput.KEY_ESC: "Esc", uinput.KEY_1: "1", uinput.KEY_2: "2", uinput.KEY_3: "3", uinput.KEY_4: "4", uinput.KEY_5: "5", uinput.KEY_6: "6",
     uinput.KEY_7: "7", uinput.KEY_8: "8", uinput.KEY_9: "9", uinput.KEY_0: "0", uinput.KEY_MINUS: "-", uinput.KEY_EQUAL: "=",
@@ -106,8 +104,8 @@ class VirtualKeyboard(Gtk.Window):
             ("Indigo", "75,0,130"),
             ("Beige", "245,245,220"),
             ("Lavender", "230,230,250")
-
         ]
+
         if (self.width!=0):
             self.set_default_size(self.width, self.height)
 
@@ -138,7 +136,7 @@ class VirtualKeyboard(Gtk.Window):
         self.device = uinput.Device(list(key_mapping.keys()))
 
         # Define rows for keys
-        rows = [
+        self.rows = [
             ["Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Home", "End", "Del" ],
             ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace" ],
             ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"],
@@ -146,11 +144,10 @@ class VirtualKeyboard(Gtk.Window):
             ["Shift_L", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "PgUp", "↑", "PgDn"],
             ["Ctrl_L","Super_L", "Alt_L", "Space", "PrtSc", "Shift_R", "←", "↓", "→"]
         ]
-
+        self.flattened_row = [key_label for row_sublist in self.rows for key_label in row_sublist] #for use in labels later on
         # Create each row and add it to the grid
-        for row_index, keys in enumerate(rows):
+        for row_index, keys in enumerate(self.rows):
             self.create_row(grid, row_index, keys)
-
 
     def create_settings(self):
         self.create_button("☰", self.change_visibility,callbacks=1)
@@ -196,7 +193,6 @@ class VirtualKeyboard(Gtk.Window):
         self.create_button( f"{self.padding_padding}")
         self.create_button("-", self.change_padding_padding, False,2)
         
-
         for label, color in self.colors:
             self.color_combobox.append_text(label)
             self.text_color_combobox.append_text(label)
@@ -206,8 +202,6 @@ class VirtualKeyboard(Gtk.Window):
 
     def on_resize(self, widget, event):
         self.width, self.height = self.get_size()  # Get the current size after resize
-
-
 
     def create_button(self, label_="", callback=None, callback2=None, callbacks=0):
         button= Gtk.Button(label=label_)
@@ -315,8 +309,6 @@ class VirtualKeyboard(Gtk.Window):
 
     def apply_css (self):
         provider = Gtk.CssProvider()
-
-
         css = f"""
         headerbar {{
             background-color: rgba({self.bg_color}, {self.opacity});
@@ -330,14 +322,10 @@ class VirtualKeyboard(Gtk.Window):
             padding: 0px;
             border: 0px;
             border-radius: {self.border_radius}px;
-            
-
-
         }}
 
         headerbar button label{{
-        color: rgb({self.text_color});
-
+            color: rgb({self.text_color});
         }}
 
         #headbar-button, #combobox button.combo {{
@@ -346,29 +334,21 @@ class VirtualKeyboard(Gtk.Window):
 
         #toplevel {{
             background-color: rgba({self.bg_color}, {self.opacity});
-
-
-
-
         }}
 
         #grid button label{{
             color: rgb({self.text_color});
-
-
         }}
 
         #grid button {{
-                    border: {self.border_width}px solid rgba({self.border_color}, {self.opacity}) ;
-                    background-image: none;
-                    border-radius: {self.border_radius}px;
-
-                }}
+            border: {self.border_width}px solid rgba({self.border_color}, {self.opacity}) ;
+            background-image: none;
+            border-radius: {self.border_radius}px;
+        }}
 
         button {{
             background-color: rgba({self.bt_color}, {self.opacity});
             color:rgb({self.text_color});
-
         }}
 
        #grid button:hover {{
@@ -383,14 +363,10 @@ class VirtualKeyboard(Gtk.Window):
         }}
 
        #combobox button.combo  {{
-
             color: rgb({self.text_color});
             padding: 5px;
         }}
-
-
         """
-
         try:
             provider.load_from_data(css.encode("utf-8"))
         except GLib.GError as e:
@@ -402,7 +378,6 @@ class VirtualKeyboard(Gtk.Window):
     def create_row(self, grid, row_index, keys):
         col = 0  # Start from the first column
         width=0
-
 
         for key_label in keys:
             key_event = next((key for key, label in key_mapping.items() if label == key_label), None)
@@ -428,10 +403,38 @@ class VirtualKeyboard(Gtk.Window):
                 col += width  # Skip 4 columns for the space button
 
     def update_label(self, show_symbols):
-        button_positions = [(16, "` ~"), (17, "1 !"), (18, "2 @"), (19, "3 #"), (20, "4 $"), (21, "5 %"), (22, "6 ^"), (23, "7 &"), (24, "8 *"), (25, "9 ("), (26, "0 )")
-        , (27, "- _"), (28, "= +"),(41,"[ {"), (42,"] }"), (43,"\\ |"), (54, "; :"), (55, "' \""), (65, ", <"), (66, ". >"), (67, "/ ?"),
-        (57, "Shift *SHIFT"), (76, "Shift *SHIFT")]
+        label_map = [ #First item in the label of the key. Second item is a string, where first character is the string for no shift, second for with shift
+            ("`", "` ~"),
+            ("1", "1 !"),
+            ("2", "2 @"),
+            ("3", "3 #"),
+            ("4", "4 $"),
+            ("5", "5 %"),
+            ("6", "6 ^"),
+            ("7", "7 &"),
+            ("8", "8 *"),
+            ("9", "9 ("),
+            ("0", "0 )"),
+            ("-", "- _"),
+            ("=", "= +"),
+            ("[", "[ {"),
+            ("]", "] }"),
+            ("\\", "\\ |"),
+            (";", "; :"),
+            ("'", "' \""),
+            (",", ", <"),
+            (".", ". >"),
+            ("/", "/ ?"),
+            ("Shift_L", "Shift *SHIFT"),
+            ("Shift_R", "Shift *SHIFT")
+        ]
 
+        button_positions = []
+        for key, value in label_map:
+            try:
+                button_positions.append((self.flattened_row.index(key), value))
+            except:
+                continue
         for pos, label in button_positions:
             label_parts = label.split()  
             if show_symbols:
@@ -440,8 +443,16 @@ class VirtualKeyboard(Gtk.Window):
                 self.row_buttons[pos].set_label(label_parts[0])
 
     def meta_update_label(self, capital):
-        button_positions = [(72, "Super *SUPER")]
-
+        label_map = [
+            ("Super_R", "Meta *META"),
+            ("Super_L", "Meta *META")
+        ]
+        button_positions = []
+        for key, value in label_map:
+            try:
+                button_positions.append((self.flattened_row.index(key), value))
+            except:
+                continue
         for pos, label in button_positions:
             label_parts = label.split()  
             if capital:
@@ -450,8 +461,16 @@ class VirtualKeyboard(Gtk.Window):
                 self.row_buttons[pos].set_label(label_parts[0])
 
     def alt_update_label(self, capital):
-        button_positions = [(73, "Alt *ALT")]
-
+        label_map = [
+            ("Alt_R", "Alt *ALT"),
+            ("Alt_L", "Alt *ALT")
+        ]
+        button_positions = []
+        for key, value in label_map:
+            try:
+                button_positions.append((self.flattened_row.index(key), value))
+            except:
+                continue
         for pos, label in button_positions:
             label_parts = label.split()  
             if capital:
@@ -460,8 +479,16 @@ class VirtualKeyboard(Gtk.Window):
                 self.row_buttons[pos].set_label(label_parts[0])
 
     def ctrl_update_label(self, capital):
-        button_positions = [(71, "Ctrl *CTRL")]
-
+        label_map = [
+            ("Ctrl_R", "Ctrl *CTRL"),
+            ("Ctrl_L", "Ctrl *CTRL")
+        ]
+        button_positions = []
+        for key, value in label_map:
+            try:
+                button_positions.append((self.flattened_row.index(key), value))
+            except:
+                continue
         for pos, label in button_positions:
             label_parts = label.split()  
             if capital:
@@ -479,8 +506,15 @@ class VirtualKeyboard(Gtk.Window):
         return False
 
     def capslock_update_label(self):
-        button_positions = [(44, "CapsLock *CAPSLOCK")]
-
+        label_map = [
+            ("CapsLock", "CapsLock *CAPSLOCK")
+        ]
+        button_positions = []
+        for key, value in label_map:
+            try:
+                button_positions.append((self.flattened_row.index(key), value))
+            except:
+                continue
         for pos, label in button_positions:
             label_parts = label.split()  
             if self.get_caps():
@@ -531,7 +565,6 @@ class VirtualKeyboard(Gtk.Window):
                 self.meta_update_label(False)
                 self.alt_update_label(False)
                 self.ctrl_update_label(False)
-        #if key_event == uinput.KEY_CAPSLOCK:
         self.capslock_update_label() #and check our caps lock symbol
 
 
@@ -562,19 +595,14 @@ class VirtualKeyboard(Gtk.Window):
         except configparser.Error as e:
             print(f"Warning: Could not read config file ({e}). Using default values.")
 
-
-
     def save_settings(self):
-
         self.config["DEFAULT"] = {"bg_color": self.bg_color, "opacity": self.opacity, "bt_color": self.bt_color, "text_color": self.text_color, "highlight_color": self.highlight_color, "border_color": self.border_color, "border_width": self.border_width, "border_radius": self.border_radius, "padding_padding": self.padding_padding, "width": self.width, "height": self.height}
-
         try:
             with open(self.CONFIG_FILE, "w") as configfile:
                 self.config.write(configfile)
 
         except (configparser.Error, IOError) as e:
             print(f"Warning: Could not write to config file ({e}). Changes will not be saved.")
-
 
 if __name__ == "__main__":
     win = VirtualKeyboard()
